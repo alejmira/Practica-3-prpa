@@ -89,10 +89,21 @@ def game_over(i):
         game_window.blit(winner_surface, winner_rect)
     
     elif i == 3:
-        draw_surface = my_font.render("DRAW!", True, white)
-        draw_rect = draw_surface.get_rect()
-        draw_rect.midtop = (window_x//2, window_y//2)
-        game_window.blit(draw_surface, draw_rect)
+        if score1 > score2:
+            winner_surface = my_font.render("Player 1 WINNER!", True, green)
+            winner_rect = winner_surface.get_rect()
+            winner_rect.midtop = (window_x//2, window_y//2)
+            game_window.blit(winner_surface, winner_rect)
+        elif score1 < score2:
+            winner_surface = my_font.render("Player 2 WINNER!", True, green)
+            winner_rect = winner_surface.get_rect()
+            winner_rect.midtop = (window_x//2, window_y//2)
+            game_window.blit(winner_surface, winner_rect)
+        elif score1 == score2: # Sólo es empate si se chocan a la vez y tienen la misma puntuación
+            draw_surface = my_font.render("DRAW!", True, white)
+            draw_rect = draw_surface.get_rect()
+            draw_rect.midtop = (window_x//2, window_y//2)
+            game_window.blit(draw_surface, draw_rect)
     
     pygame.display.flip()
     time.sleep(10)
