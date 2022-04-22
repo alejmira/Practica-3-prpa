@@ -33,7 +33,7 @@ game_window = pygame.display.set_mode((window_x, window_y))
 fps = pygame.time.Clock()
 
 # Posición inicial de snake
-# Se hace lo del //10 *10 para que no haya problemas de colisión
+# Se hace lo del //10 *10 para que no haya problemas de colisión, y siempre sea un mutiplo de 10
 snake_position = [random.randrange(1, (window_x//10)) * 10, random.randrange(1, (window_y//10)) * 10]
 # Cuerpo inicial de la serpiente
 snake_body = [snake_position]
@@ -108,8 +108,7 @@ while True:
         snake_body.pop()
          
     if not fruit_spawn:
-        fruit_position = [random.randrange(1, (window_x//10)) * 10,
-                          random.randrange(1, (window_y//10)) * 10]
+        fruit_position = [random.randrange(1, (window_x//10)) * 10, random.randrange(1, (window_y//10)) * 10]
          
     fruit_spawn = True
     game_window.fill(black)
