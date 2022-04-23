@@ -103,5 +103,5 @@ class Server():
                     except:
                         self.running=False
                     """
-        por lo que he visto habria que usar threads o process para snake_position
+        por lo que he visto habria que usar threads o process
         """
