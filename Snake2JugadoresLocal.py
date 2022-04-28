@@ -17,7 +17,7 @@ black = pygame.Color(0, 0, 0)
 red = pygame.Color(255, 0, 0)
 green = pygame.Color(0, 255, 0)
 blue = pygame.Color(0, 0, 255)
-yellow = pygame.Color(255, 255, 102)
+yellow = pygame.Color(255, 255, 0)
 white = pygame.Color(255, 255, 255)
 
 snake_speed = 15
@@ -32,7 +32,7 @@ fps = pygame.time.Clock()
 snake_position1 = [100, 50]
 snake_body1 = [snake_position1]
 
-snake_position2 = [window_x - 100, window_y - 50]
+snake_position2 = [window_x - 110, window_y - 60]
 snake_body2 = [snake_position2]
 
 fruit_position = [random.randrange(1, (window_x//10)) * 10, random.randrange(1, (window_y//10)) * 10]
