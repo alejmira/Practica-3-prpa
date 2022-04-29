@@ -203,9 +203,9 @@ def player(number, conn, game):
                     game.change_direction(number, "UP")
                 elif command == "down":
                     game.change_direction(number, "DOWN")
-                elif command = "left":
+                elif command == "left":
                     game.change_direction(number, "LEFT")
-                elif command = "right":
+                elif command == "right":
                     game.change_direction(number, "RIGHT")
                 elif command == "quit":
                     game.stop()
