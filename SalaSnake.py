@@ -27,6 +27,7 @@ snake_speed = 15
 
 class Snake():
     def __init__(self, color):
+        self.color = color
         if color == "BLUE":
             self.pos = [100, 50]
             self.direction = "RIGHT"
@@ -203,12 +204,13 @@ def player(number, conn, game):
                     game.change_direction(number, "UP")
                 elif command == "down":
                     game.change_direction(number, "DOWN")
-                elif command = "left":
+                elif command == "left":
                     game.change_direction(number, "LEFT")
-                elif command = "right":
+                elif command == "right":
                     game.change_direction(number, "RIGHT")
                 elif command == "quit":
                     game.stop()
+                game.move(number)
             conn.send(game.get_info())
     except:
         traceback.print_exc()
