@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
@@ -10,6 +9,7 @@ Created on Thu Apr 28 10:42:26 2022
 import pygame
 import time
 import random
+import sys
 from multiprocessing.connection import Listener
 from multiprocessing import Process, Manager, Value, Lock
 
@@ -35,7 +35,7 @@ class Snake():
             self.pos = [window_x-110, window_y-60]
             self.direction = "LEFT"
         self.body = [self.pos]
-        self.change_to = direction
+        self.change_to = self.direction
         
     def get_color(self):
         return self.color
@@ -80,6 +80,7 @@ class Apple():
 
     def get_pos(self):
         return self.pos
+  
     
 class Game():
     def __init__(self, manager):
@@ -88,46 +89,111 @@ class Game():
         self.score = manager.list([0,0])
         self.running = Value('i', 1)
         self.lock = Lock()
-        
-        def get_player(self, number): # 0: BLUE, 1: YELLOW
-            return self.players[number]
+    
+    def get_player(self, number): # 0: BLUE, 1: YELLOW
+        return self.players[number]
 
-        def get_apple(self):
-            return self.apple[0]
-        
-        def get_score(self, number): # 0: BLUE, 1: YELLOW
-            return self.score[number]
-        
-        def is_running(self):
-            return self.running.value == 1
-        
-        def stop(self):
-            self.running.value = 0
-        
-        def change_direction(self, player, key):
-            self.lock.acquire()
-            p = self.players[player]
-            p.change_direction(key)
-            self.players[player] = p
-            self.lock.release()
-        
-        def move(self, player):
-            self.lock.acquire()
-            p = self.players[player]
-            p.move()
-            self.players[player] = p
-            self.lock.release()
+    def get_apple(self):
+        return self.apple[0]
+    
+    def get_score(self, number): # 0: BLUE, 1: YELLOW
+        return self.score[number]
+    
+    def is_running(self):
+        return self.running.value == 1
+    
+    def stop(self):
+        self.running.value = 0
+    
+    def change_direction(self, player, key):
+        self.lock.acquire()
+        p = self.players[player]
+        p.change_direction(key)
+        self.players[player] = p
+        self.lock.release()
+    
+    def move(self, player):
+        self.lock.acquire()
+        p = self.players[player]
+        p.move()
+        self.players[player] = p
+        self.lock.release()
 
-        def get_info(self):
-            info = {
-                'pos_left_player': self.players[0].get_pos(),
-                'pos_right_player': self.players[1].get_pos(),
-                'pos_ball': self.apple[0].get_pos(),
-                'score': list(self.score),
-                'is_running': self.running.value == 1
-            }
-            return info
-        
+    def get_info(self):
+        info = {
+            'pos_blue': self.players[0].get_pos(),
+            'pos_yellow': self.players[1].get_pos(),
+            'body_blue': self.players[0].get_body(),
+            'body_yellow': self.players[1].get_body(),
+            'pos_apple': self.apple[0].get_pos(),
+            'score': list(self.score),
+            'is_running': self.running.value == 1
+        }
+        return info
+   
+    
+def player(number, conn, game):
+    try:
+        conn.send(game.get_info())
+        while game.is_running():
+            command = conn.recv()
+            if command == "up":
+                game.change_direction(number, "UP")
+            elif command == "down":
+                game.change_direction(number, "DOWN")
+            elif command == "left":
+                game.change_direction(number, "LEFT")
+            elif command == "right":
+                game.change_direction(number, "RIGHT")
+                
+            
+            
+            game.move(number)
+            conn.send(game.get_info())
+    except:
+        traceback.print_exc()
+        conn.close()
+    finally:
+        print(f"Game ended {game}")
+
+def main(ip_address):
+    manager = Manager()
+    try:
+        with Listener((ip_address, 6111), authkey=b'secret password') as listener:
+            n_player = 0
+            players = [None, None]
+            game = Game(manager)
+            while True:
+                print(f"accepting connection {n_player}")
+                conn = listener.accept()
+                players[n_player] = Process(target=player, args=(n_player, conn, game))
+                n_player += 1
+                if n_player == 2:
+                    players[0].start()
+                    players[1].start()
+                    n_player = 0
+                    players = [None, None]
+                    game = Game(manager)
+
+    except Exception as e:
+        traceback.print_exc()
+
+if __name__=='__main__':
+    ip_address = "127.0.0.1"
+    if len(sys.argv)>1:
+        ip_address = sys.argv[1]
+
+    main(ip_address)
+
+
+
+
+
+
+
+
+
+
 def show_score(choice, font, size):
     score_font = pygame.font.SysFont(font, size)
     # Blue
@@ -142,6 +208,7 @@ def show_score(choice, font, size):
     
     game_window.blit(score_surface1, score_rect1)
     game_window.blit(score_surface2, score_rect2)
+
 
 def game_over(i):
     my_font = pygame.font.SysFont('times new roman', 50)
@@ -188,63 +255,3 @@ def game_over(i):
     time.sleep(10)
     pygame.quit()
     quit()
-
-
-
-    
-def player(number, conn, game):
-    try:
-        print(f"starting player {SIDESSTR[side]}:{game.get_info()}")
-        conn.send((side, game.get_info()))
-        while game.is_running():
-            command = ""
-            while command != "next":
-                command = conn.recv()
-                if command == "up":
-                    game.change_direction(number, "UP")
-                elif command == "down":
-                    game.change_direction(number, "DOWN")
-                elif command == "left":
-                    game.change_direction(number, "LEFT")
-                elif command == "right":
-                    game.change_direction(number, "RIGHT")
-                elif command == "quit":
-                    game.stop()
-                game.move(number)
-            conn.send(game.get_info())
-    except:
-        traceback.print_exc()
-        conn.close()
-    finally:
-        print(f"Game ended {game}")
-
-    
-    
-def main(ip_address):
-    manager = Manager()
-    try:
-        with Listener((ip_address, 6111), authkey=b'secret password') as listener:
-            n_player = 0
-            players = [None, None]
-            game = Game(manager)
-            while True:
-                print(f"accepting connection {n_player}")
-                conn = listener.accept()
-                players[n_player] = Process(target=player, args=(n_player, conn, game))
-                n_player += 1
-                if n_player == 2:
-                    players[0].start()
-                    players[1].start()
-                    n_player = 0
-                    players = [None, None]
-                    game = Game(manager)
-
-    except Exception as e:
-        traceback.print_exc()
-
-if __name__=='__main__':
-    ip_address = "127.0.0.1"
-    if len(sys.argv)>1:
-        ip_address = sys.argv[1]
-
-    main(ip_address)
