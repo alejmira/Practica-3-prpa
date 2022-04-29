@@ -28,10 +28,10 @@ snake_speed = 15
 class Snake():
     def __init__(self, color):
         self.color = color
-        if color == "BLUE":
+        if self.color == "BLUE":
             self.pos = [100, 50]
             self.direction = "RIGHT"
-        elif color == "YELLOW":
+        elif self.color == "YELLOW":
             self.pos = [window_x-110, window_y-60]
             self.direction = "LEFT"
         self.body = [self.pos]
