@@ -147,18 +147,16 @@ def main(ip_address):
                     if event.key == pygame.K_RIGHT:
                         conn.send("right")
                 
-                
+                gameinfo = conn.recv()
+                game.update(gameinfo) 
                 
                 for pos in game.players[0].body:
                     pygame.draw.rect(game_window, blue, pygame.Rect(pos[0], pos[1], 10, 10))
                 for pos in game.players[1].body:
                     pygame.draw.rect(game_window, yellow, pygame.Rect(pos[0], pos[1], 10, 10))
                 
-                
-                
-                conn.send("next")
-                gameinfo = conn.recv()
-                game.update(gameinfo)
+                pygame.display.update()
+                fps.tick(snake_speed)
                 
     except:
         traceback.print_exc()

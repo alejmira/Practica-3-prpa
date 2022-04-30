@@ -90,14 +90,14 @@ class Game():
         self.running = Value('i', 1)
         self.lock = Lock()
     
-    def get_player(self, number): # 0: BLUE, 1: YELLOW
-        return self.players[number]
+    def get_player(self, player): # 0: BLUE, 1: YELLOW
+        return self.players[player]
 
     def get_apple(self):
         return self.apple[0]
     
-    def get_score(self, number): # 0: BLUE, 1: YELLOW
-        return self.score[number]
+    def get_score(self, player): # 0: BLUE, 1: YELLOW
+        return self.score[player]
     
     def is_running(self):
         return self.running.value == 1
@@ -145,6 +145,19 @@ def player(number, conn, game):
                 game.change_direction(number, "LEFT")
             elif command == "right":
                 game.change_direction(number, "RIGHT")
+                
+            game.move(number)
+            game.players[number].body.insert(0, game.players[number].pos)
+# =============================================================================
+#             if snake_position1[0] == fruit_position[0] and snake_position1[1] == fruit_position[1]:
+#                 score1 += 10
+#                 fruit_spawn = False
+#             else:
+# =============================================================================
+            game.players[number].body.pop()
+            
+            conn.send(game.get_info())
+            
                 
             
             
