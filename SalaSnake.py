@@ -65,13 +65,13 @@ class Snake():
     
     def move(self):
         if self.direction == 'UP':
-            self.position[1] -= 10
+            self.pos[1] -= 10
         if self.direction == 'DOWN':
-            self.position[1] += 10
+            self.pos[1] += 10
         if self.direction == 'LEFT':
-            self.position[0] -= 10
+            self.pos[0] -= 10
         if self.direction == 'RIGHT':
-            self.position[0] += 10
+            self.pos[0] += 10
             
     
 class Apple():
@@ -134,20 +134,22 @@ class Game():
     
 def player(number, conn, game):
     try:
-        print(game.get_info())
+        #print(game.get_info())
         conn.send(game.get_info())
         while game.is_running():
-            command = conn.recv()
-            if command == "up":
-                game.change_direction(number, "UP")
-            elif command == "down":
-                game.change_direction(number, "DOWN")
-            elif command == "left":
-                game.change_direction(number, "LEFT")
-            elif command == "right":
-                game.change_direction(number, "RIGHT")
+            command = ""
+            while command != "next":
+                command = conn.recv()
+                if command == "up":
+                    game.change_direction(number, "UP")
+                elif command == "down":
+                    game.change_direction(number, "DOWN")
+                elif command == "left":
+                    game.change_direction(number, "LEFT")
+                elif command == "right":
+                    game.change_direction(number, "RIGHT")
+
                 
-            print("HOLA")
             game.move(number)
             game.players[number].body.insert(0, game.players[number].pos)
             game.players[number].body.pop()
