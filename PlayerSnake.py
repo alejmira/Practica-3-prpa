@@ -138,14 +138,15 @@ def main(ip_address):
             while game.is_running():
                 
                 for event in pygame.event.get():
-                    if event.key == pygame.K_UP:
-                        conn.send("up")
-                    if event.key == pygame.K_DOWN:
-                        conn.send("down")
-                    if event.key == pygame.K_LEFT:
-                        conn.send("left")
-                    if event.key == pygame.K_RIGHT:
-                        conn.send("right")
+                    if event.type == pygame.KEYDOWN:
+                        if event.key == pygame.K_UP:
+                            conn.send("up")
+                        if event.key == pygame.K_DOWN:
+                            conn.send("down")
+                        if event.key == pygame.K_LEFT:
+                            conn.send("left")
+                        if event.key == pygame.K_RIGHT:
+                            conn.send("right")
                 
                 gameinfo = conn.recv()
                 game.update(gameinfo) 
