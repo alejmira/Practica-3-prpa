@@ -154,10 +154,10 @@ def player(number, conn, game):
             game.players[number].body.insert(0, game.players[number].pos)
             game.players[number].body.pop()
             
-            print(game.get_info())
+            #print(game.get_info())
             conn.send(game.get_info())
             
-            print(game.get_info())
+            #print(game.get_info())
             game.move(number)
             conn.send(game.get_info())
     except:
