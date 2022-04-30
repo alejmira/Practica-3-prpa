@@ -134,6 +134,7 @@ class Game():
     
 def player(number, conn, game):
     try:
+        print(game.get_info())
         conn.send(game.get_info())
         while game.is_running():
             command = conn.recv()
@@ -146,21 +147,15 @@ def player(number, conn, game):
             elif command == "right":
                 game.change_direction(number, "RIGHT")
                 
+            print("HOLA")
             game.move(number)
             game.players[number].body.insert(0, game.players[number].pos)
-# =============================================================================
-#             if snake_position1[0] == fruit_position[0] and snake_position1[1] == fruit_position[1]:
-#                 score1 += 10
-#                 fruit_spawn = False
-#             else:
-# =============================================================================
             game.players[number].body.pop()
             
+            print(game.get_info())
             conn.send(game.get_info())
             
-                
-            
-            
+            print(game.get_info())
             game.move(number)
             conn.send(game.get_info())
     except:

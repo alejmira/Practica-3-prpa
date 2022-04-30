@@ -131,31 +131,44 @@ def main(ip_address):
             game_window = pygame.display.set_mode((window_x, window_y))
             fps = pygame.time.Clock()
             
+            
             game = Game()
             gameinfo = conn.recv()
             game.update(gameinfo)
-    
+            
+            print(gameinfo)
+            
             while game.is_running():
                 
                 for event in pygame.event.get():
                     if event.type == pygame.KEYDOWN:
                         if event.key == pygame.K_UP:
+                            print("up")
                             conn.send("up")
                         if event.key == pygame.K_DOWN:
+                            print("down")
                             conn.send("down")
                         if event.key == pygame.K_LEFT:
+                            print("left")
                             conn.send("left")
                         if event.key == pygame.K_RIGHT:
+                            print("right")
                             conn.send("right")
                 
                 gameinfo = conn.recv()
                 game.update(gameinfo) 
+                print(gameinfo)
                 
                 for pos in game.players[0].body:
                     pygame.draw.rect(game_window, blue, pygame.Rect(pos[0], pos[1], 10, 10))
                 for pos in game.players[1].body:
                     pygame.draw.rect(game_window, yellow, pygame.Rect(pos[0], pos[1], 10, 10))
                 
+                pygame.draw.rect(game_window, red, pygame.Rect(game.apple.pos[0], game.apple.pos[1], 10, 10))
+                
+                gameinfo = conn.recv()
+                game.update(gameinfo) 
+                print(gameinfo)
                 pygame.display.update()
                 fps.tick(snake_speed)
                 
