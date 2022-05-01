@@ -154,6 +154,41 @@ def main(ip_address):
                             conn.send("left")
                         if event.key == pygame.K_RIGHT:
                             conn.send("right")
+                        if (game.players[0].pos < 0 or game.players[0].pos > window_x-10 or game.players[0].pos < 0 or game.players[0].pos > window_y-10) and (game.players[1].pos < 0 or game.players[1].pos > window_x-10 or game.players[1].pos < 0 or game.players[1].pos > window_y-10):
+                        game_over(3)
+                    
+                        if game.players[number].pos < 0 or game.players[number].pos > window_x-10 or game.players[number].pos < 0 or game.players[number].pos > window_y-10:
+                            conn.send("game over" + srt(number))
+
+
+
+                        #if game.players[1].pos < 0 or  game.players[1].pos > window_x-10 or game.players[1].pos < 0 or game.players[1].pos > window_y-10:
+                         #   game_over(1)
+
+                        if game.players[0].pos == game.players[1].pos:
+                            game_over(3)
+
+                        for block in game.players[0].body:
+                            if game.players[0].pos == block and game.players[1] == block:
+                                game_over(3)
+                            elif game.players[0].pos == block:
+                                game_over(2)
+                            elif game.players[1] == block:
+                                game_over(1)
+
+                        for block in game.players[0].body:
+                            if game.players[0].pos == block and game.players[1] == block:
+                                game_over(3)
+                            elif game.players[1] == block:
+                                game_over(1)
+                            elif game.players[0].pos == block:
+                                game_over(2)
+
+                        if score1 == 500:
+                            game_over(1)
+
+                        elif score2 == 500:
+                            game_over(2)
                 
                 conn.send("next")
                 gameinfo = conn.recv()
