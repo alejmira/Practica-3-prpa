@@ -149,9 +149,8 @@ def player(number, conn, game):
                 elif command == "right":
                     game.change_direction(number, "RIGHT")
             
-                
             game.move(number)
-                        
+
             game.players[number].body.insert(0, game.players[number].pos)
             if game.players[number].pos == game.apple[0].pos: 
                 game.score[number] += 10
@@ -159,12 +158,11 @@ def player(number, conn, game):
             else:
                 game.players[number].body.pop()
             
-            game.apple[0].spawn = True
+            
             #print(game.get_info())
             conn.send(game.get_info())
             
             #print(game.get_info())
-            game.move(number)
             conn.send(game.get_info())
     except:
         traceback.print_exc()
