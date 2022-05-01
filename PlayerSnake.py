@@ -125,7 +125,47 @@ class Game():
         self.set_apple_pos(gameinfo['pos_apple'])
         self.set_score(gameinfo['score'])
         self.running = gameinfo['is_running']
-
+    
+    def gameOver(self, i):
+        my_font =  pygame.font.SysFont('times new roman', 50)
+        game_over_surface1 =my_font.render('Player 1 Score: ' + str(self.score[0]), True, blue)
+        game_over_rect1 = game_over_surface1.get_rect()
+        game_over_rect1.midtop = (window_x//2, window_y//6)
+        game_window.blit(game_over_surface1, game_over_rect1)
+        
+        game_over_surface2 = my_font.render('Player 2 Score: ' + str(self.score[1]), True, yellow)
+        game_over_rect2 = game_over_surface2.get_rect()
+        game_over_rect2.midtop = (window_x//2, window_y//3)
+        game_window.blit(game_over_surface2, game_over_rect2)
+        
+        if i == 1:
+            winner_surface = my_font.render("Player 1 WINNER!", True, green)
+            winner_rect = winner_surface.get_rect()
+            winner_rect.midtop = (window_x//2, window_y//2)
+            game_window.blit(winner_surface, winner_rect)
+            
+        elif i == 2:
+            winner_surface = my_font.render("Player 2 WINNER!", True, green)
+            winner_rect = winner_surface.get_rect()
+            winner_rect.midtop = (window_x//2, window_y//2)
+            game_window.blit(winner_surface, winner_rect)
+        
+        elif i == 3:
+            if self.score[0] > self.score[1]:
+                winner_surface = my_font.render("Player 1 WINNER!", True, green)
+                winner_rect = winner_surface.get_rect()
+                winner_rect.midtop = (window_x//2, window_y//2)
+                game_window.blit(winner_surface, winner_rect)
+            elif self.score[0] < self.score[1]:
+                winner_surface = my_font.render("Player 2 WINNER!", True, green)
+                winner_rect = winner_surface.get_rect()
+                winner_rect.midtop = (window_x//2, window_y//2)
+                game_window.blit(winner_surface, winner_rect)
+            elif self.score[0] == self.score[1]: # Sólo es empate si se chocan a la vez y tienen la misma puntuación
+                draw_surface = my_font.render("DRAW!", True, white)
+                draw_rect = draw_surface.get_rect()
+                draw_rect.midtop = (window_x//2, window_y//2)
+                game_window.blit(draw_surface, draw_rect)
 
 def main(ip_address):
     try:
