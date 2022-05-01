@@ -65,6 +65,7 @@ class Apple():
         self.pos = pos
 
 
+
 class Game():
     def __init__(self):
         self.players = [Snake("BLUE"), Snake("YELLOW")]
@@ -86,6 +87,9 @@ class Game():
     
     def set_apple_pos(self, pos):
         self.apple.set_pos(pos)
+    
+    def set_apple_spawn(self, spawn):
+        self.apple.set_spawn(spawn)
     
     def get_score(self, number): # 0: BLUE, 1: YELLOW
         return self.score[number]

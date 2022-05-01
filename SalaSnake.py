@@ -77,10 +77,10 @@ class Snake():
 class Apple():
     def __init__(self):
         self.pos = [random.randrange(1, (window_x//10)) * 10, random.randrange(1, (window_y//10)) * 10]
-
+        
     def get_pos(self):
         return self.pos
-  
+    
     
 class Game():
     def __init__(self, manager):
@@ -148,12 +148,18 @@ def player(number, conn, game):
                     game.change_direction(number, "LEFT")
                 elif command == "right":
                     game.change_direction(number, "RIGHT")
-
+            
                 
             game.move(number)
+                        
             game.players[number].body.insert(0, game.players[number].pos)
-            game.players[number].body.pop()
+            if game.players[number].pos == game.apple[0].pos: 
+                game.score[number] += 10
+                game.apple[0] = Apple()
+            else:
+                game.players[number].body.pop()
             
+            game.apple[0].spawn = True
             #print(game.get_info())
             conn.send(game.get_info())
             
