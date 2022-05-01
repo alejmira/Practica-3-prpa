@@ -180,6 +180,22 @@ class Game():
         time.sleep(10)
         pygame.quit()
         quit()
+    
+    def show_score(self, choice, font, size, game_window):
+        score_font = pygame.font.SysFont(font, size)
+        # Azul
+        score_surface1 = score_font.render('Player 1 score: ' + str(self.score[0]), True, blue)
+        score_rect1 = score_surface1.get_rect()
+        score_rect1.midtop = (70, 5)
+        
+        #Yellow
+        score_surface2 = score_font.render('Player 2 score: ' + str(self.score[1]), True, yellow)
+        score_rect2 = score_surface2.get_rect()
+        score_rect2.midtop = (window_x-90, 5)
+        
+        game_window.blit(score_surface1, score_rect1)
+        game_window.blit(score_surface2, score_rect2)
+        
         
 def main(ip_address):
     try:
@@ -237,6 +253,8 @@ def main(ip_address):
                 elif game.game_over == 3:
                     game.gameOver(3, game_window)
                     game.stop()
+                
+                game.show_score(1, 'times new roman', 20, game_window)
                 
                 pygame.display.update()
                 fps.tick(snake_speed)
