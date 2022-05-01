@@ -71,6 +71,7 @@ class Game():
         self.players = [Snake("BLUE"), Snake("YELLOW")]
         self.apple = Apple()
         self.score = [0,0]
+        self.game_over = None
         self.running = True
     
     def get_player(self, number): # 0: BLUE, 1: YELLOW
@@ -96,6 +97,12 @@ class Game():
     
     def set_score(self, score):
         self.score = score
+    
+    def get_game_over(self):
+        return self.game_over
+    
+    def set_game_over(self, i):
+        self.game_over = i
     
     def is_running(self):
         return self.running
@@ -125,8 +132,10 @@ class Game():
         self.set_apple_pos(gameinfo['pos_apple'])
         self.set_score(gameinfo['score'])
         self.running = gameinfo['is_running']
+        self.game_over = gameinfo['game_over']
     
-    def gameOver(self, i):
+    def gameOver(self, i, game_window):
+        game_window.fill(black)
         my_font =  pygame.font.SysFont('times new roman', 50)
         game_over_surface1 =my_font.render('Player 1 Score: ' + str(self.score[0]), True, blue)
         game_over_rect1 = game_over_surface1.get_rect()
@@ -166,7 +175,12 @@ class Game():
                 draw_rect = draw_surface.get_rect()
                 draw_rect.midtop = (window_x//2, window_y//2)
                 game_window.blit(draw_surface, draw_rect)
-
+        
+        pygame.display.flip()
+        time.sleep(10)
+        pygame.quit()
+        quit()
+        
 def main(ip_address):
     try:
         with Client((ip_address, 6111), authkey=b'secret password') as conn:
@@ -180,7 +194,7 @@ def main(ip_address):
             gameinfo = conn.recv()
             game.update(gameinfo)
             
-            print(gameinfo)
+            #print(gameinfo)
             
             while game.is_running():
                 
@@ -199,7 +213,7 @@ def main(ip_address):
                 conn.send("next")
                 gameinfo = conn.recv()
                 game.update(gameinfo) 
-                print(gameinfo)
+                #print(gameinfo)
                 
                 game_window.fill(black)
                 
@@ -212,7 +226,18 @@ def main(ip_address):
                 
                 gameinfo = conn.recv()
                 game.update(gameinfo) 
-                print(gameinfo)
+                #print(gameinfo)
+                
+                if game.game_over == 1:
+                    game.gameOver(1, game_window)
+                    game.stop()
+                elif game.game_over == 2:
+                    game.gameOver(2, game_window)
+                    game.stop()
+                elif game.game_over == 3:
+                    game.gameOver(3, game_window)
+                    game.stop()
+                
                 pygame.display.update()
                 fps.tick(snake_speed)
                 
