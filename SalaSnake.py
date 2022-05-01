@@ -169,11 +169,42 @@ def player(number, conn, game):
             else:
                 L.pop()
                 game.set_body(number, L)
-            
-            
-            #print(game.get_info())
-            conn.send(game.get_info())
-            
+
+            if (game.players[0].pos < 0 or game.players[0].pos > window_x-10 or game.players[0].pos < 0 or game.players[0].pos > window_y-10) and (game.players[1].pos < 0 or game.players[1].pos > window_x-10 or game.players[1].pos < 0 or game.players[1].pos > window_y-10):
+                game_over(3)
+
+            if game.players[number].pos < 0 or game.players[number].pos > window_x-10 or game.players[number].pos < 0 or game.players[number].pos > window_y-10:
+                conn.send("game over" + srt(number))
+
+
+
+            #if game.players[1].pos < 0 or  game.players[1].pos > window_x-10 or game.players[1].pos < 0 or game.players[1].pos > window_y-10:
+             #   game_over(1)
+
+            if game.players[0].pos == game.players[1].pos:
+                game_over(3)
+
+            for block in game.players[0].body:
+                if game.players[0].pos == block and game.players[1] == block:
+                    game_over(3)
+                elif game.players[0].pos == block:
+                    game_over(2)
+                elif game.players[1] == block:
+                    game_over(1)
+
+            for block in game.players[0].body:
+                if game.players[0].pos == block and game.players[1] == block:
+                    game_over(3)
+                elif game.players[1] == block:
+                    game_over(1)
+                elif game.players[0].pos == block:
+                    game_over(2)
+
+            if score1 == 500:
+                game_over(1)
+
+            elif score2 == 500:
+                game_over(2)
             #print(game.get_info())
             conn.send(game.get_info())
     except:
@@ -200,6 +231,7 @@ def main(ip_address):
                     n_player = 0
                     players = [None, None]
                     game = Game(manager)
+                
 
     except Exception as e:
         traceback.print_exc()
