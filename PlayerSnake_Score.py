@@ -14,6 +14,7 @@ from multiprocessing.connection import Client
 
 window_x= 720
 window_y = 480
+game_window = pygame.display.set_mode((window_x, window_y))
 
 black = pygame.Color(0, 0, 0)
 red = pygame.Color(255, 0, 0)
@@ -21,6 +22,7 @@ green = pygame.Color(0, 255, 0)
 blue = pygame.Color(0, 0, 255)
 yellow = pygame.Color(255, 255, 0)
 white = pygame.Color(255, 255, 255)
+score =[0,0]
 
 snake_speed = 15
 
@@ -71,8 +73,8 @@ class Game():
         self.players = [Snake("BLUE"), Snake("YELLOW")]
         self.apple = Apple()
         self.score = [0,0]
-        self.game_over = None
         self.running = True
+        self.game_window = pygame.display.set_mode((window_x, window_y))
     
     def get_player(self, number): # 0: BLUE, 1: YELLOW
         return self.players[number]
@@ -97,12 +99,6 @@ class Game():
     
     def set_score(self, score):
         self.score = score
-    
-    def get_game_over(self):
-        return self.game_over
-    
-    def set_game_over(self, i):
-        self.game_over = i
     
     def is_running(self):
         return self.running
@@ -132,10 +128,10 @@ class Game():
         self.set_apple_pos(gameinfo['pos_apple'])
         self.set_score(gameinfo['score'])
         self.running = gameinfo['is_running']
-        self.game_over = gameinfo['game_over']
     
-    def gameOver(self, i, game_window):
+    def show_score(self,game_window,score):
         game_window.fill(black)
+<<<<<<< HEAD:PlayerSnake.py
         my_font =  pygame.font.SysFont('times new roman', 50)
         game_over_surface1 =my_font.render('Player 1 Score: ' + str(self.score[0]), True, blue)
         game_over_rect1 = game_over_surface1.get_rect()
@@ -197,12 +193,28 @@ class Game():
         game_window.blit(score_surface2, score_rect2)
         
         
+=======
+        score_font = pygame.font.SysFont('arial', 26)
+    # Blue
+        score_surface1 = score_font.render('Player 1 score: ' + str(self.score[0]), True, blue)
+        score_rect1 = score_surface1.get_rect()
+        score_rect1.midtop = (70, 5)
+    
+    #Yellow
+        score_surface2 = score_font.render('Player 2 score: ' + str(self.score[1]), True, yellow)
+        score_rect2 = score_surface2.get_rect()
+        score_rect2.midtop = (window_x-90, 5)
+        return
+        self.game_window.blit(score_surface1, score_rect1)
+        self.game_window.blit(score_surface2, score_rect2)
+
+
+>>>>>>> fa68f246dad805a285183376b20424863ffff0b7:PlayerSnake_Score.py
 def main(ip_address):
     try:
         with Client((ip_address, 6111), authkey=b'secret password') as conn:
             pygame.init()
             pygame.display.set_caption("Snake")
-            game_window = pygame.display.set_mode((window_x, window_y))
             fps = pygame.time.Clock()
             
             
@@ -210,7 +222,7 @@ def main(ip_address):
             gameinfo = conn.recv()
             game.update(gameinfo)
             
-            #print(gameinfo)
+            print(gameinfo)
             
             while game.is_running():
                 
@@ -229,8 +241,10 @@ def main(ip_address):
                 conn.send("next")
                 gameinfo = conn.recv()
                 game.update(gameinfo) 
-                #print(gameinfo)
+                print(gameinfo)
                 
+                
+                game.show_score(game_window,score)
                 game_window.fill(black)
                 
                 for pos in game.players[0].body:
@@ -242,6 +256,7 @@ def main(ip_address):
                 
                 gameinfo = conn.recv()
                 game.update(gameinfo) 
+<<<<<<< HEAD:PlayerSnake.py
                 #print(gameinfo)
                 
                 if game.game_over == 1:
@@ -256,6 +271,9 @@ def main(ip_address):
                 
                 game.show_score(1, 'times new roman', 20, game_window)
                 
+=======
+                print(gameinfo)
+>>>>>>> fa68f246dad805a285183376b20424863ffff0b7:PlayerSnake_Score.py
                 pygame.display.update()
                 fps.tick(snake_speed)
                 
