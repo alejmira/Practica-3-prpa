@@ -173,22 +173,34 @@ def player(number, conn, game):
             game.set_body(number, L)
             if game.players[number].pos == game.apple[0].pos: 
                 game.set_score(number)
-                print(game.score[number])
                 game.apple[0] = Apple()
             else:
                 L.pop()
                 game.set_body(number, L)
-
+                
+            # Por algún motivo que no alcanza a mi comprensión, si borras una de estas fos líneas de código repetido, no funciona    
+            
             #print(game.get_info())
             conn.send(game.get_info())
             
+            #print(game.get_info())
+            conn.send(game.get_info())
+            
+            
+            # CONDICIONES DE GAME OVER
+            
             # Los dos se salen de la pantalla a la vez
-            if (game.players[0].pos < 0 or game.players[0].pos > window_x-10 or game.players[0].pos < 0 or game.players[0].pos > window_y-10) and (game.players[1].pos < 0 or game.players[1].pos > window_x-10 or game.players[1].pos < 0 or game.players[1].pos > window_y-10):
+            if (game.players[0].pos[0] < 0 or game.players[0].pos[0] > window_x-10 or game.players[0].pos[1] < 0 or game.players[0].pos[1] > window_y-10) and (game.players[1].pos[0] < 0 or game.players[1].pos[0] > window_x-10 or game.players[1].pos[1] < 0 or game.players[1].pos[1] > window_y-10):
                 game.set_game_over()
                 conn.send(game.get_info())
             
-            # Uno se sale de la pantalla
-            if game.players[number].pos < 0 or game.players[number].pos > window_x-10 or game.players[number].pos < 0 or game.players[number].pos > window_y-10:
+            # El azul se sale de la pantalla
+            if game.players[0].pos[0] < 0 or game.players[0].pos[0] > window_x-10 or game.players[0].pos[1] < 0 or game.players[0].pos[1] > window_y-10:
+                game.set_game_over()
+                conn.send(game.get_info())
+                
+            # El amarillo se sale de la pantalla
+            if game.players[1].pos[0] < 0 or game.players[1].pos[0] > window_x-10 or game.players[1].pos[1] < 0 or game.players[1].pos[1] > window_y-10:
                 game.set_game_over()
                 conn.send(game.get_info())
                 
@@ -197,13 +209,22 @@ def player(number, conn, game):
                 game.set_game_over()
                 conn.send(game.get_info())
             
-            # Alguno se choca en el cuerpo del otro, posiblemente los dos a la vez
-            for block in game.players[number].body:
-                if game.players[number].pos == block and game.players[(number+1)%2+1] == block:
+            # Alguno se choca en el cuerpo del azul, posiblemente los dos a la vez
+            for block in game.players[0].body[1:]:
+                if game.players[0].pos == block and game.players[1] == block:
                     game.set_game_over()
-                elif game.players[number].pos == block:
+                elif game.players[0].pos == block:
                     game.set_game_over()
-                elif game.players[(number+1)%2+1] == block:
+                elif game.players[1] == block:
+                    game.set_game_over()
+            
+            # Alguno se choca en el cuerpo del amarillo, posiblemente los dos a la vez
+            for block in game.players[1].body[1:]:
+                if game.players[1].pos == block and game.players[0] == block:
+                    game.set_game_over()
+                elif game.players[1].pos == block:
+                    game.set_game_over()
+                elif game.players[0] == block:
                     game.set_game_over()
              
             # Alguno alcanza la puntuación máxima
@@ -211,12 +232,14 @@ def player(number, conn, game):
                 game.set_game_over()
             elif game.score[1] == 500:
                 game.set_game_over()
-            
+                
     except:
         traceback.print_exc()
         conn.close()
     finally:
         print(f"Game ended {game}")
+
+
 
 def main(ip_address):
     manager = Manager()

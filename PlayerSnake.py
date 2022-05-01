@@ -140,7 +140,7 @@ def main(ip_address):
             gameinfo = conn.recv()
             game.update(gameinfo)
             
-            #print(gameinfo)
+            print(gameinfo)
             
             while game.is_running():
                 
@@ -159,7 +159,7 @@ def main(ip_address):
                 conn.send("next")
                 gameinfo = conn.recv()
                 game.update(gameinfo) 
-                #print(gameinfo)
+                print(gameinfo)
                 
                 game_window.fill(black)
                 
@@ -172,7 +172,7 @@ def main(ip_address):
                 
                 gameinfo = conn.recv()
                 game.update(gameinfo) 
-                #print(gameinfo)
+                print(gameinfo)
                 pygame.display.update()
                 fps.tick(snake_speed)
                 
