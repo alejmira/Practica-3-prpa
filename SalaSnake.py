@@ -30,11 +30,12 @@ class Snake():
         self.color = color
         if self.color == "BLUE":
             self.pos = [100, 50]
+            self.body = [[100, 50]]
             self.direction = "RIGHT"
         elif self.color == "YELLOW":
             self.pos = [window_x-110, window_y-60]
+            self.body = [[window_x-110, window_y-60]]
             self.direction = "LEFT"
-        self.body = [self.pos]
         self.change_to = self.direction
         
     def get_color(self):
@@ -45,6 +46,9 @@ class Snake():
     
     def get_body(self):
         return self.body
+    
+    def set_body(self, body):
+        self.body = body
     
     def get_direction(self):
         return self.direction
@@ -92,7 +96,14 @@ class Game():
     
     def get_player(self, player): # 0: BLUE, 1: YELLOW
         return self.players[player]
-
+    
+    def set_body(self, player, body):
+        self.lock.acquire()
+        p = self.players[player]
+        p.set_body(body)
+        self.players[player] = p
+        self.lock.release()
+    
     def get_apple(self):
         return self.apple[0]
     
@@ -148,15 +159,16 @@ def player(number, conn, game):
                     game.change_direction(number, "LEFT")
                 elif command == "right":
                     game.change_direction(number, "RIGHT")
-            
             game.move(number)
-
-            game.players[number].body.insert(0, game.players[number].pos)
+            L = game.players[number].body
+            L.insert(0, game.players[number].pos)
+            game.set_body(number, L)
             if game.players[number].pos == game.apple[0].pos: 
                 game.score[number] += 10
                 game.apple[0] = Apple()
             else:
-                game.players[number].body.pop()
+                L.pop()
+                game.set_body(number, L)
             
             
             #print(game.get_info())

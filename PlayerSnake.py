@@ -29,7 +29,7 @@ class Snake():
         self.color = color
         self.pos = [None, None]
         self.direction = None
-        self.body = [self.pos]
+        self.body = [[None, None]]
         self.change_to = self.direction
         
     def get_color(self):
