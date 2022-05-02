@@ -6,6 +6,7 @@ Created on Thu Apr 28 10:42:26 2022
 @author: alejandro
 """
 
+import traceback
 import pygame
 import time
 import random

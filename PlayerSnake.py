@@ -6,6 +6,7 @@ Created on Fri Apr 29 17:52:53 2022
 @author: alejandro
 """
 
+import traceback
 import pygame
 import time
 import random
@@ -188,7 +189,7 @@ class Game():
         score_rect1 = score_surface1.get_rect()
         score_rect1.midtop = (70, 5)
         
-        #Yellow
+        # Amarillo
         score_surface2 = score_font.render('Player 2 score: ' + str(self.score[1]), True, yellow)
         score_rect2 = score_surface2.get_rect()
         score_rect2.midtop = (window_x-90, 5)
