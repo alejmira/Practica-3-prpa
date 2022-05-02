@@ -7,7 +7,6 @@ Created on Thu Apr 28 10:42:26 2022
 """
 
 import traceback
-import pygame
 import time
 import random
 import sys
@@ -17,12 +16,6 @@ from multiprocessing import Process, Manager, Value, Lock
 window_x= 720
 window_y = 480
 
-black = pygame.Color(0, 0, 0)
-red = pygame.Color(255, 0, 0)
-green = pygame.Color(0, 255, 0)
-blue = pygame.Color(0, 0, 255)
-yellow = pygame.Color(255, 255, 0)
-white = pygame.Color(255, 255, 255)
 
 snake_speed = 15
 
@@ -39,38 +32,38 @@ class Snake():
             self.direction = "LEFT"
         self.change_to = self.direction
         
-    def get_color(self):
+    def get_color(self): #Color jugador
         return self.color
         
-    def get_pos(self):
+    def get_pos(self): #Posición jugador
         return self.pos
     
-    def get_body(self):
+    def get_body(self): #Tamaño cuerpo actual del jugador
         return self.body
     
-    def set_body(self, body):
+    def set_body(self, body): #Reestablecimiento del tamaño del cuerpo tras comerse una manzana
         self.body = body
     
-    def get_direction(self):
+    def get_direction(self): #Dirección y sentido actual hacia la que va el jugador
         return self.direction
     
-    def get_change_to(self):
+    def get_change_to(self): 
         return self.change_to
     
-    def change_direction(self, key):
+    def change_direction(self, key): #Cambio de dirección
         self.change_to = key
         if self.change_to == 'UP' and self.direction != 'DOWN':
-            self.direction = 'UP'
+            self.direction = 'UP' #No podemos cambiar dirección de arriba a abajo, primero hay que mverse hacia uno de los lados
         elif self.change_to == 'DOWN' and self.direction != 'UP':
             self.direction = 'DOWN'
         elif self.change_to == 'LEFT' and self.direction != 'RIGHT':
-            self.direction = 'LEFT'
+            self.direction = 'LEFT' #Igual que antes, no podemos cambiar el sentido directamente dentro de la misma dirección
         if self.change_to == 'RIGHT' and self.direction != 'LEFT':
             self.direction = 'RIGHT'
     
     def move(self):
         if self.direction == 'UP':
-            self.pos[1] -= 10
+            self.pos[1] -= 10 #Movimiento que realizamos cuando cambiamos dirección
         if self.direction == 'DOWN':
             self.pos[1] += 10
         if self.direction == 'LEFT':
@@ -82,16 +75,16 @@ class Snake():
 class Apple():
     def __init__(self):
         self.pos = [random.randrange(1, (window_x//10)) * 10, random.randrange(1, (window_y//10)) * 10]
-        
+         #La posición inicial de la manzana es aleatoria
     def get_pos(self):
-        return self.pos
+        return self.pos #Devuelve posición de la manzana
     
     
 class Game():
     def __init__(self, manager):
-        self.players = manager.list([Snake("BLUE"), Snake("YELLOW")])
-        self.apple = manager.list([Apple()])
-        self.score = manager.list([0,0])
+        self.players = manager.list([Snake("BLUE"), Snake("YELLOW")]) #Juego dispuesto para dos jugadores/serpientes
+        self.apple = manager.list([Apple()]) #Una sola manzana, cuando es comida se genera una nueva en una nueva posición aleatoria
+        self.score = manager.list([0,0])  #puntuación marcador, número de manzanas que ha comido un jugador, cada una *10
         self.game_over = 0
         self.running = Value('i', 1)
         self.lock = Lock()
@@ -112,13 +105,13 @@ class Game():
     def get_score(self, player): # 0: BLUE, 1: YELLOW
         return self.score[player]
     
-    def set_score(self, player):
+    def set_score(self, player): #reestablecimiento del marcador
         self.score[player] += 10
     
     def get_game_over(self):
         return self.game_over
     
-    def set_game_over(self, i):
+    def set_game_over(self, i): #Cambia el estado de gameover (partida acabada o no)
         self.game_over = i
         
     def is_running(self):
@@ -275,8 +268,3 @@ if __name__=='__main__':
 
     main(ip_address)
 
-    
-    pygame.display.flip()
-    time.sleep(10)
-    pygame.quit()
-    quit()
