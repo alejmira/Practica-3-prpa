@@ -13,6 +13,7 @@ import random
 import sys
 from multiprocessing.connection import Client
 
+# Constantes del juego
 window_x= 720
 window_y = 480
 
@@ -39,13 +40,13 @@ class Snake():
     def get_pos(self):
         return self.pos
     
-    def set_pos(self, pos):
+    def set_pos(self, pos): # Cambia la posición de la serpiente
         self.pos = pos
     
     def get_body(self):
         return self.body
     
-    def set_body(self, body):
+    def set_body(self, body): # Cambia el cuerpo de la serpiente
         self.body = body
     
     def get_direction(self):
@@ -62,7 +63,7 @@ class Apple():
     def get_pos(self):
         return self.pos
 
-    def set_pos(self, pos):
+    def set_pos(self, pos): # Cambia la posición de la manzana
         self.pos = pos
 
 
@@ -78,54 +79,37 @@ class Game():
     def get_player(self, number): # 0: BLUE, 1: YELLOW
         return self.players[number]
     
-    def set_pos_player(self, number, pos):
+    def set_pos_player(self, number, pos): # Cambia la posición de la serpiente del jugador number
         self.players[number].set_pos(pos)
         
-    def set_body_player(self, number, body):
+    def set_body_player(self, number, body): # Cambia el cuerpo de la serpiente del jugador number
         self.players[number].set_body(body)
     
     def get_apple(self):
         return self.apple
     
-    def set_apple_pos(self, pos):
+    def set_apple_pos(self, pos): # Cambia la posición de la manzana
         self.apple.set_pos(pos)
     
-    def set_apple_spawn(self, spawn):
-        self.apple.set_spawn(spawn)
-    
-    def get_score(self, number): # 0: BLUE, 1: YELLOW
+    def get_score(self, number):
         return self.score[number]
     
-    def set_score(self, score):
+    def set_score(self, score): # Cambia la puntuación
         self.score = score
     
     def get_game_over(self):
         return self.game_over
     
-    def set_game_over(self, i):
+    def set_game_over(self, i): # Cambia el estado de game over
         self.game_over = i
     
     def is_running(self):
         return self.running
     
-    def stop(self):
-        self.running = False
-    
-    def change_direction(self, player, key):
-        self.lock.acquire()
-        p = self.players[player]
-        p.change_direction(key)
-        self.players[player] = p
-        self.lock.release()
-    
-    def move(self, player):
-        self.lock.acquire()
-        p = self.players[player]
-        p.move()
-        self.players[player] = p
-        self.lock.release()
+    def stop(self): # Detiene la ejecución del bucle principal
+        self.running = False 
 
-    def update(self, gameinfo):
+    def update(self, gameinfo): # Actualiza la información del juego recibida en gameinfo
         self.set_pos_player(0, gameinfo["pos_blue"])
         self.set_pos_player(1, gameinfo["pos_yellow"])
         self.set_body_player(0, gameinfo["body_blue"])
@@ -135,7 +119,7 @@ class Game():
         self.running = gameinfo['is_running']
         self.game_over = gameinfo['game_over']
     
-    def gameOver(self, i, game_window):
+    def gameOver(self, i, game_window): # Método que muestra la pantalla de fin del juego
         game_window.fill(black)
         my_font =  pygame.font.SysFont('times new roman', 50)
         game_over_surface1 =my_font.render('Player 1 Score: ' + str(self.score[0]), True, blue)
@@ -148,19 +132,19 @@ class Game():
         game_over_rect2.midtop = (window_x//2, window_y//3)
         game_window.blit(game_over_surface2, game_over_rect2)
         
-        if i == 1:
+        if i == 1: # Gana azul
             winner_surface = my_font.render("Player 1 WINNER!", True, green)
             winner_rect = winner_surface.get_rect()
             winner_rect.midtop = (window_x//2, window_y//2)
             game_window.blit(winner_surface, winner_rect)
             
-        elif i == 2:
+        elif i == 2: # Gana amarillo
             winner_surface = my_font.render("Player 2 WINNER!", True, green)
             winner_rect = winner_surface.get_rect()
             winner_rect.midtop = (window_x//2, window_y//2)
             game_window.blit(winner_surface, winner_rect)
         
-        elif i == 3:
+        elif i == 3: # Posible empate. Se miran a las puntuaciones para ver si hay desempate
             if self.score[0] > self.score[1]:
                 winner_surface = my_font.render("Player 1 WINNER!", True, green)
                 winner_rect = winner_surface.get_rect()
@@ -182,7 +166,7 @@ class Game():
         pygame.quit()
         quit()
     
-    def show_score(self, choice, font, size, game_window):
+    def show_score(self, choice, font, size, game_window): # Método que enseña la puntuación actual de los jugadores
         score_font = pygame.font.SysFont(font, size)
         # Azul
         score_surface1 = score_font.render('Player 1 score: ' + str(self.score[0]), True, blue)
@@ -201,20 +185,20 @@ class Game():
 def main(ip_address):
     try:
         with Client((ip_address, 6111), authkey=b'secret password') as conn:
+            # Inicialización de la ventana de juego
             pygame.init()
             pygame.display.set_caption("Snake")
             game_window = pygame.display.set_mode((window_x, window_y))
             fps = pygame.time.Clock()
             
-            
             game = Game()
             gameinfo = conn.recv()
             game.update(gameinfo)
             
-            #print(gameinfo)
             
-            while game.is_running():
+            while game.is_running(): # Bucle principal
                 
+                # Dinámica de entrada de movimiento del usuario y su envío al servidor
                 for event in pygame.event.get():
                     if event.type == pygame.KEYDOWN:
                         if event.key == pygame.K_UP:
@@ -225,26 +209,23 @@ def main(ip_address):
                             conn.send("left")
                         if event.key == pygame.K_RIGHT:
                             conn.send("right")
-                        
-                
                 conn.send("next")
-                gameinfo = conn.recv()
-                game.update(gameinfo) 
-                #print(gameinfo)
                 
+                # Dibujo de las serpientes
                 game_window.fill(black)
-                
                 for pos in game.players[0].body:
                     pygame.draw.rect(game_window, blue, pygame.Rect(pos[0], pos[1], 10, 10))
                 for pos in game.players[1].body:
                     pygame.draw.rect(game_window, yellow, pygame.Rect(pos[0], pos[1], 10, 10))
                 
+                # Dibujo de la manzana
                 pygame.draw.rect(game_window, red, pygame.Rect(game.apple.pos[0], game.apple.pos[1], 10, 10))
                 
+                # Actualización de los parámetros del juego
                 gameinfo = conn.recv()
                 game.update(gameinfo) 
-                #print(gameinfo)
                 
+                # Chequeo de game over
                 if game.game_over == 1:
                     game.gameOver(1, game_window)
                     game.stop()
@@ -255,6 +236,7 @@ def main(ip_address):
                     game.gameOver(3, game_window)
                     game.stop()
                 
+                # Dibujo de las puntuaciones
                 game.show_score(1, 'times new roman', 20, game_window)
                 
                 pygame.display.update()

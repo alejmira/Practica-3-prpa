@@ -13,11 +13,10 @@ import sys
 from multiprocessing.connection import Listener
 from multiprocessing import Process, Manager, Value, Lock
 
+# Tamaño de la ventana para las posiciones inciales de las serpientes
 window_x= 720
 window_y = 480
 
-
-snake_speed = 15
 
 class Snake():
     def __init__(self, color):
@@ -32,19 +31,19 @@ class Snake():
             self.direction = "LEFT"
         self.change_to = self.direction
         
-    def get_color(self): #Color jugador
+    def get_color(self):
         return self.color
         
-    def get_pos(self): #Posición jugador
+    def get_pos(self):
         return self.pos
     
-    def get_body(self): #Tamaño cuerpo actual del jugador
+    def get_body(self):
         return self.body
     
-    def set_body(self, body): #Reestablecimiento del tamaño del cuerpo tras comerse una manzana
+    def set_body(self, body): #Reestablecimiento del cuerpo tras comerse una manzana
         self.body = body
     
-    def get_direction(self): #Dirección y sentido actual hacia la que va el jugador
+    def get_direction(self):
         return self.direction
     
     def get_change_to(self): 
@@ -52,18 +51,20 @@ class Snake():
     
     def change_direction(self, key): #Cambio de dirección
         self.change_to = key
+        #No podemos cambiar dirección de arriba a abajo, primero hay que mverse hacia uno de los lados
         if self.change_to == 'UP' and self.direction != 'DOWN':
-            self.direction = 'UP' #No podemos cambiar dirección de arriba a abajo, primero hay que mverse hacia uno de los lados
+            self.direction = 'UP' 
         elif self.change_to == 'DOWN' and self.direction != 'UP':
             self.direction = 'DOWN'
+        #Igual que antes, no podemos cambiar el sentido directamente dentro de la misma dirección
         elif self.change_to == 'LEFT' and self.direction != 'RIGHT':
-            self.direction = 'LEFT' #Igual que antes, no podemos cambiar el sentido directamente dentro de la misma dirección
+            self.direction = 'LEFT' 
         if self.change_to == 'RIGHT' and self.direction != 'LEFT':
             self.direction = 'RIGHT'
     
-    def move(self):
+    def move(self): # Se mueve 10 pixeles (1 bloque) en su dirección
         if self.direction == 'UP':
-            self.pos[1] -= 10 #Movimiento que realizamos cuando cambiamos dirección
+            self.pos[1] -= 10
         if self.direction == 'DOWN':
             self.pos[1] += 10
         if self.direction == 'LEFT':
@@ -73,26 +74,25 @@ class Snake():
             
     
 class Apple():
-    def __init__(self):
+    def __init__(self): #La posición inicial de la manzana es aleatoria
         self.pos = [random.randrange(1, (window_x//10)) * 10, random.randrange(1, (window_y//10)) * 10]
-         #La posición inicial de la manzana es aleatoria
     def get_pos(self):
-        return self.pos #Devuelve posición de la manzana
+        return self.pos
     
     
 class Game():
     def __init__(self, manager):
         self.players = manager.list([Snake("BLUE"), Snake("YELLOW")]) #Juego dispuesto para dos jugadores/serpientes
         self.apple = manager.list([Apple()]) #Una sola manzana, cuando es comida se genera una nueva en una nueva posición aleatoria
-        self.score = manager.list([0,0])  #puntuación marcador, número de manzanas que ha comido un jugador, cada una *10
-        self.game_over = 0
+        self.score = manager.list([0,0])  #puntuación inicial del marcador, número de manzanas que ha comido un jugador, cada una *10
+        self.game_over = 0 # Estado de game over inicial. 0 = No hay game over. 1 = Gana Azul. 2 = Gana Amarillo. 3 = Posible empate.
         self.running = Value('i', 1)
         self.lock = Lock()
     
     def get_player(self, player): # 0: BLUE, 1: YELLOW
         return self.players[player]
     
-    def set_body(self, player, body):
+    def set_body(self, player, body): #Reestablecimiento del cuerpo tras comerse una manzana del jugador player
         self.lock.acquire()
         p = self.players[player]
         p.set_body(body)
@@ -102,10 +102,10 @@ class Game():
     def get_apple(self):
         return self.apple[0]
     
-    def get_score(self, player): # 0: BLUE, 1: YELLOW
+    def get_score(self, player):
         return self.score[player]
     
-    def set_score(self, player): #reestablecimiento del marcador
+    def set_score(self, player): #Suma 10 puntos al marcador de player
         self.score[player] += 10
     
     def get_game_over(self):
@@ -117,24 +117,24 @@ class Game():
     def is_running(self):
         return self.running.value == 1
     
-    def stop(self):
+    def stop(self): # Detiene la ejecución del bucle principal
         self.running.value = 0
     
-    def change_direction(self, player, key):
+    def change_direction(self, player, key): #Cambio de dirección del jugador player
         self.lock.acquire()
         p = self.players[player]
         p.change_direction(key)
         self.players[player] = p
         self.lock.release()
     
-    def move(self, player):
+    def move(self, player): # Movimiento del jugador player
         self.lock.acquire()
         p = self.players[player]
         p.move()
         self.players[player] = p
         self.lock.release()
 
-    def get_info(self):
+    def get_info(self): # Para el envío de información del juego a los clientes
         info = {
             'pos_blue': self.players[0].get_pos(),
             'pos_yellow': self.players[1].get_pos(),
@@ -148,11 +148,12 @@ class Game():
         return info
    
     
-def player(number, conn, game):
+def player(number, conn, game): # FUnción principal
     try:
-        #print(game.get_info())
         conn.send(game.get_info())
-        while game.is_running():
+        while game.is_running(): # Bucle principal del juego
+            
+            # Cambio de dirección de la serpiente
             command = ""
             while command != "next":
                 command = conn.recv()
@@ -165,24 +166,19 @@ def player(number, conn, game):
                 elif command == "right":
                     game.change_direction(number, "RIGHT")
             game.move(number)
+            
+            # Cambio del body de la serpiente al moverse
             L = game.players[number].body
             L.insert(0, game.players[number].pos)
             game.set_body(number, L)
-            if game.players[number].pos == game.apple[0].pos: 
-                game.set_score(number)
-                game.apple[0] = Apple()
-            else:
+            if game.players[number].pos == game.apple[0].pos: # Como la serpiente se ha movido si ha comido la manzana no borramos el último bloque, así se hace más grande
+                game.set_score(number) # Se suman los puntos
+                game.apple[0] = Apple() # Se crea ua nueva manzana aleatoria
+            else: # Como la serpiente se ha movido si no se ha comido la manzana borramos el último bloque de la serpiente
                 L.pop()
                 game.set_body(number, L)
-                
-            # Por algún motivo que no alcanza a mi comprensión, si borras una de estas fos líneas de código repetido, no funciona    
-            
-            #print(game.get_info())
+                            
             conn.send(game.get_info())
-            
-            #print(game.get_info())
-            conn.send(game.get_info())
-            
             
             # CONDICIONES DE GAME OVER
             
