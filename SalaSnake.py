@@ -177,25 +177,20 @@ def player(number, conn, game): # FUnción principal
             else: # Como la serpiente se ha movido si no se ha comido la manzana borramos el último bloque de la serpiente
                 L.pop()
                 game.set_body(number, L)
-                            
-            conn.send(game.get_info())
             
             # CONDICIONES DE GAME OVER
             
             # Los dos se salen de la pantalla a la vez
             if (game.players[0].pos[0] < 0 or game.players[0].pos[0] > window_x-10 or game.players[0].pos[1] < 0 or game.players[0].pos[1] > window_y-10) and (game.players[1].pos[0] < 0 or game.players[1].pos[0] > window_x-10 or game.players[1].pos[1] < 0 or game.players[1].pos[1] > window_y-10):
                 game.set_game_over(3)
-                conn.send(game.get_info())
             
             # El azul se sale de la pantalla
             if game.players[0].pos[0] < 0 or game.players[0].pos[0] > window_x-10 or game.players[0].pos[1] < 0 or game.players[0].pos[1] > window_y-10:
                 game.set_game_over(2)
-                conn.send(game.get_info())
                 
             # El amarillo se sale de la pantalla
             if game.players[1].pos[0] < 0 or game.players[1].pos[0] > window_x-10 or game.players[1].pos[1] < 0 or game.players[1].pos[1] > window_y-10:
                 game.set_game_over(1)
-                conn.send(game.get_info())
                 
             # Colisión frontal
             if game.players[0].pos == game.players[1].pos:
@@ -203,28 +198,28 @@ def player(number, conn, game): # FUnción principal
                 conn.send(game.get_info())
             
             # Alguno se choca en el cuerpo del azul, posiblemente los dos a la vez
-            for block in game.players[0].body[1:]:
-                if game.players[0].pos == block and game.players[1] == block:
-                    game.set_game_over(3)
-                elif game.players[0].pos == block:
-                    game.set_game_over(2)
-                elif game.players[1] == block:
-                    game.set_game_over(1)
+            if game.players[0].pos in game.players[0].body[1:] and game.players[1].pos in game.players[0].body[1:]:
+                game.set_game_over(3)
+            elif game.players[0].pos in game.players[0].body[1:]:
+                game.set_game_over(2)
+            elif game.players[1].pos in game.players[0].body[1:]:
+                game.set_game_over(1)
             
             # Alguno se choca en el cuerpo del amarillo, posiblemente los dos a la vez
-            for block in game.players[1].body[1:]:
-                if game.players[1].pos == block and game.players[0] == block:
-                    game.set_game_over(3)
-                elif game.players[1].pos == block:
-                    game.set_game_over(1)
-                elif game.players[0] == block:
-                    game.set_game_over(2)
+            if game.players[0].pos in game.players[1].body[1:] and game.players[1].pos in game.players[1].body[1:]:
+                game.set_game_over(3)
+            elif game.players[0].pos in game.players[1].body[1:]:
+                game.set_game_over(2)
+            elif game.players[1].pos in game.players[1].body[1:]:
+                game.set_game_over(1)
              
             # Alguno alcanza la puntuación máxima
             if game.score[0] == 500:
                 game.set_game_over(1)
             elif game.score[1] == 500:
                 game.set_game_over(2)
+                
+            conn.send(game.get_info())
                 
     except:
         traceback.print_exc()

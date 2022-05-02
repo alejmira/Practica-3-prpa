@@ -226,22 +226,20 @@ while True:
         game_over(3)
     
     # Blue
-    for block in snake_body1[1:]:
-        if snake_position1 == block and snake_position2 == block:
-            game_over(3)
-        elif snake_position1 == block:
-            game_over(2)
-        elif snake_position2 == block:
-            game_over(1)
-    
+    if snake_position1 in snake_body1[1:] and snake_position2 in snake_body1[1:]:
+        game_over(3)
+    elif snake_position1 in snake_body1[1:]:
+        game_over(2)
+    elif snake_position2 in snake_body1[1:]:
+        game.set_game_over(1)
+
     # Yellow
-    for block in snake_body2[1:]:
-        if snake_position1 == block and snake_position2 == block:
-            game_over(3)
-        elif snake_position2 == block:
-            game_over(1)
-        elif snake_position1 == block:
-            game_over(2)
+    if snake_position1 in snake_body2[1:] and snake_position2 in snake_body2[1:]:
+        game_over(3)
+    elif snake_position1 in snake_body2[1:]:
+        game_over(2)
+    elif snake_position2 in snake_body2[1:]:
+        game.set_game_over(1)
     
     # Blue wins by score
     if score1 == 500:
