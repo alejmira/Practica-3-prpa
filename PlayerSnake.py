@@ -166,7 +166,7 @@ class Game():
         pygame.quit()
         quit()
     
-    def show_score(self, choice, font, size, game_window): # Método que enseña la puntuación actual de los jugadores
+    def show_score(self, font, size, game_window): # Método que enseña la puntuación actual de los jugadores
         score_font = pygame.font.SysFont(font, size)
         # Azul
         score_surface1 = score_font.render('Player 1 score: ' + str(self.score[0]), True, blue)
@@ -237,7 +237,7 @@ def main(ip_address):
                     game.stop()
                 
                 # Dibujo de las puntuaciones
-                game.show_score(1, 'times new roman', 20, game_window)
+                game.show_score('times new roman', 20, game_window)
                 
                 pygame.display.update()
                 fps.tick(snake_speed)

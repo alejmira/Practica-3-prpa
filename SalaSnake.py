@@ -85,7 +85,7 @@ class Game():
         self.players = manager.list([Snake("BLUE"), Snake("YELLOW")]) #Juego dispuesto para dos jugadores/serpientes
         self.apple = manager.list([Apple()]) #Una sola manzana, cuando es comida se genera una nueva en una nueva posición aleatoria
         self.score = manager.list([0,0])  #puntuación inicial del marcador, número de manzanas que ha comido un jugador, cada una *10
-        self.game_over = 0 # Estado de game over inicial. 0 = No hay game over. 1 = Gana Azul. 2 = Gana Amarillo. 3 = Posible empate.
+        self.game_over = Value("i", 0) # Estado de game over inicial. 0 = No hay game over. 1 = Gana Azul. 2 = Gana Amarillo. 3 = Posible empate.
         self.running = Value('i', 1)
         self.lock = Lock()
     
@@ -109,10 +109,10 @@ class Game():
         self.score[player] += 10
     
     def get_game_over(self):
-        return self.game_over
+        return self.game_over.value
     
     def set_game_over(self, i): #Cambia el estado de gameover (partida acabada o no)
-        self.game_over = i
+        self.game_over.value = i
         
     def is_running(self):
         return self.running.value == 1
@@ -143,7 +143,7 @@ class Game():
             'pos_apple': self.apple[0].get_pos(),
             'score': list(self.score),
             'is_running': self.running.value == 1,
-            'game_over': self.game_over
+            'game_over': self.game_over.value
         }
         return info
    
